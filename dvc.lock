@@ -1,0 +1,89 @@
+schema: '2.0'
+stages:
+  qc:
+    cmd: python scripts/dataset_qc.py --images data/dataset/images/train 
+      --labels data/dataset/labels/train --num-classes 3 --out 
+      metrics/qc_train.json
+    deps:
+    - path: data/dataset
+      hash: md5
+      md5: 328acaa3e6cfb7009f537627d7f1cdf5.dir
+      size: 252
+      nfiles: 1
+    - path: scripts/dataset_qc.py
+      hash: md5
+      md5: 451f718cbcbde99f7c44fdcaa4389364
+      size: 1675
+    - path: src/visionpipe/datatools.py
+      hash: md5
+      md5: e8a854d8b321f6b36b4e7fa229c95486
+      size: 7771
+    outs:
+    - path: metrics/qc_train.json
+      hash: md5
+      md5: 64780a80cfa565120c2737adce82b7cc
+      size: 135
+  train:
+    cmd: python scripts/train.py --params params.yaml
+    deps:
+    - path: data/dataset
+      hash: md5
+      md5: 328acaa3e6cfb7009f537627d7f1cdf5.dir
+      size: 252
+      nfiles: 1
+    - path: metrics/qc_train.json
+      hash: md5
+      md5: 64780a80cfa565120c2737adce82b7cc
+      size: 135
+    - path: scripts/train.py
+      hash: md5
+      md5: dc33832f3f51c544005a45834c49dd20
+      size: 2325
+    params:
+      params.yaml:
+        data:
+          yaml: data/tiny_dataset/data.yaml
+          num_classes: 3
+        train:
+          model: yolov8n.pt
+          epochs: 1
+          imgsz: 640
+          batch: 16
+          workers: 2
+          seed: 0
+          patience: 15
+          lr0: 0.01
+          hsv_v: 0.5
+          degrees: 5
+          mosaic: 1.0
+    outs:
+    - path: metrics/train_metrics.json
+      hash: md5
+      md5: 56e3df1415afed12816df1e773734ed7
+      size: 194
+    - path: models/best.pt
+      hash: md5
+      md5: b3c1e6b0ff32d9bcf4050fc25564fc6c
+      size: 6243555
+  evaluate:
+    cmd: python scripts/evaluate.py --weights models/best.pt --data 
+      data/tiny_dataset/data.yaml --min-map50 0.0 --out metrics/eval.json
+    deps:
+    - path: models/best.pt
+      hash: md5
+      md5: b3c1e6b0ff32d9bcf4050fc25564fc6c
+      size: 6243555
+    - path: scripts/evaluate.py
+      hash: md5
+      md5: c828a2deaf6c3cc411b1c23b0c197d1f
+      size: 2336
+    params:
+      params.yaml:
+        evaluate:
+          min_map50: 0.0
+          max_drop_vs_baseline: 0.02
+    outs:
+    - path: metrics/eval.json
+      hash: md5
+      md5: f3b86b4b085062348f1dbcb3566c0f93
+      size: 127

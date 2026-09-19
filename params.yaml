@@ -5,7 +5,7 @@ data:
 
 train:
   model: yolov8n.pt       # start from COCO-pretrained weights, fine-tune on our data
-  epochs: 50
+  epochs: 100
   imgsz: 640
   batch: 16
   workers: 2              # low value to prevent Windows hanging

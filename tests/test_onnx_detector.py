@@ -75,3 +75,36 @@ def test_provider_options(model_path):
     det = ONNXYoloDetector(model_path, providers=providers)
     # The session should have successfully initialized with the provided options
     assert "CPUExecutionProvider" in det.providers
+
+
+import os
+import cv2
+from visionpipe.detect.yolo import YOLODetector
+
+@pytest.mark.skipif(not os.path.exists("yolov8n.onnx"), reason="yolov8n.onnx not found")
+def test_real_weights_parity():
+    """Run real weights on a dummy image to confirm layout and compare ONNX vs PT."""
+    img = np.zeros((480, 640, 3), dtype=np.uint8)
+    cv2.rectangle(img, (100, 100), (300, 300), (255, 255, 255), -1)
+
+    pt_det = YOLODetector("yolov8n.pt", conf=0.25, iou=0.45)
+    dets_pt = pt_det.detect(img)
+
+    onnx_det = ONNXYoloDetector("yolov8n.onnx", conf=0.25, iou=0.45)
+    
+    # Check shape
+    x, r, left, top = onnx_det.preprocess(img)
+    raw = onnx_det.session.run(None, {onnx_det.input_name: x})[0]
+    # layout should be (1, 4+nc, num_anchors)
+    assert len(raw.shape) == 3
+    assert raw.shape[0] == 1
+    assert raw.shape[1] == 4 + len(onnx_det.names)
+    
+    dets_onnx = onnx_det.detect(img)
+    
+    # We expect agreement in number of detections (often 0 on this dummy image, but valid test either way)
+    assert len(dets_pt) == len(dets_onnx)
+    for dp, do in zip(dets_pt, dets_onnx):
+        assert dp.cls_name == do.cls_name
+        assert dp.score == pytest.approx(do.score, abs=0.05)
+        np.testing.assert_allclose(dp.box, do.box, atol=2.0)

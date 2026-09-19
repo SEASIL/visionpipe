@@ -1,0 +1,18 @@
+data:
+  num_classes: 3
+  yaml: data/tiny_dataset/data.yaml
+evaluate:
+  max_drop_vs_baseline: 0.02
+  min_map50: 0.5
+train:
+  batch: 16
+  degrees: 5
+  epochs: 1
+  hsv_v: 0.5
+  imgsz: 640
+  lr0: 0.01
+  model: yolov8n.pt
+  mosaic: 1.0
+  patience: 15
+  seed: 0
+  workers: 2

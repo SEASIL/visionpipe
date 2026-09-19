@@ -1,0 +1,7 @@
+path: C:\Users\Asif\OneDrive\Desktop\projects\visionpipe\data\tiny_dataset
+train: images/train
+val: images/val
+names:
+  0: person
+  1: car
+  2: backpack
