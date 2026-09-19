@@ -1,0 +1,40 @@
+# Zero-download demo: background-subtraction detector on the synthetic clip.
+# Run:  python scripts/make_synthetic_video.py && python -m visionpipe -c configs/demo.yaml
+camera_id: cam0
+source:
+  uri: data/synthetic.mp4
+
+detector:
+  type: motion
+  min_area: 600
+  label: person          # in the synthetic clip, moving rectangles stand in for people
+
+tracker:
+  high_thresh: 0.5
+  low_thresh: 0.1
+  new_track_thresh: 0.6
+  max_lost: 30
+  min_hits: 3
+
+rules:
+  - type: zone_intrusion
+    name: restricted_area
+    polygon: [[340, 200], [620, 200], [620, 450], [340, 450]]
+    classes: [person]
+    min_frames: 5
+  - type: loitering
+    name: restricted_area
+    polygon: [[340, 200], [620, 200], [620, 450], [340, 450]]
+    classes: [person]
+    dwell_seconds: 6
+  - type: line_crossing
+    name: counting_line
+    p1: [0, 250]
+    p2: [640, 250]
+    classes: [person]
+
+output:
+  events_jsonl: outputs/{camera_id}/events.jsonl
+  metadata_jsonl: outputs/{camera_id}/metadata.jsonl
+  mot_txt: outputs/{camera_id}/tracks.txt
+  video: outputs/{camera_id}/annotated.mp4

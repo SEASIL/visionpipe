@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[cpu,dev]"
+      - run: make lint
+      - run: make test
+      - name: End-to-end smoke test (events + MOTA/IDF1 gate)
+        run: make smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-outputs-py${{ matrix.python }}
+          path: outputs/
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t visionpipe:cpu .
+      - name: Container smoke test
+        run: |
+          docker run --rm visionpipe:cpu --help
+          docker run --rm -v "$PWD:/work" -w /work --entrypoint python visionpipe:cpu scripts/make_synthetic_video.py --out /tmp/s.mp4

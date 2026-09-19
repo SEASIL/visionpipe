@@ -1,0 +1,9 @@
+# Ultralytics dataset config (copy to data.yaml). Layout:
+#   data/dataset/images/{train,val}/*.jpg   data/dataset/labels/{train,val}/*.txt  (YOLO format)
+path: data/dataset
+train: images/train
+val: images/val
+names:
+  0: person
+  1: car
+  2: backpack

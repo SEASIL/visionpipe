@@ -1,0 +1,51 @@
+# Template for real footage. Copy to configs/site.yaml and edit.
+camera_id: entrance-1
+source:
+  uri: rtsp://user:pass@10.0.0.5/stream1   # or a file path / webcam index
+  reconnect: true
+
+detector:
+  type: onnx                  # onnx (light, no PyTorch) | yolo (Ultralytics, .pt/.engine/OpenVINO)
+  weights: models/best.onnx
+  conf: 0.30
+  iou: 0.5
+  imgsz: 640
+  classes: [person, backpack]
+
+tracker:
+  high_thresh: 0.5
+  low_thresh: 0.1
+  new_track_thresh: 0.6
+  max_lost: 45                # frames a track survives without a match (~1.5 s at 30 fps)
+  min_hits: 3
+
+rules:
+  - type: zone_intrusion
+    name: restricted_area
+    polygon: [[100, 200], [500, 200], [500, 450], [100, 450]]   # pixel coordinates of the stream
+    classes: [person]
+    min_frames: 8
+  - type: loitering
+    name: lobby
+    polygon: [[520, 200], [900, 200], [900, 450], [520, 450]]
+    classes: [person]
+    dwell_seconds: 30
+  - type: line_crossing
+    name: door_counter
+    p1: [0, 300]
+    p2: [1280, 300]
+    classes: [person]
+  - type: crowd
+    name: plaza
+    polygon: [[0, 300], [1280, 300], [1280, 720], [0, 720]]
+    threshold: 8
+    min_frames: 15
+  - type: abandoned_object
+    name: unattended_bag
+    stationary_seconds: 60
+    owner_radius_px: 200
+
+output:
+  events_jsonl: outputs/{camera_id}/events.jsonl
+  metadata_jsonl: outputs/{camera_id}/metadata.jsonl
+  video: outputs/{camera_id}/annotated.mp4

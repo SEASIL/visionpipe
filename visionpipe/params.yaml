@@ -1,0 +1,20 @@
+# Tracked by DVC: `dvc exp run -S train.epochs=100` records params + metrics per experiment.
+data:
+  yaml: data/dataset/data.yaml
+  num_classes: 3          # keep in sync with data.yaml
+
+train:
+  model: yolov8n.pt       # start from COCO-pretrained weights, fine-tune on our data
+  epochs: 50
+  imgsz: 640
+  batch: 16
+  seed: 0
+  patience: 15
+  lr0: 0.01
+  hsv_v: 0.5              # stronger brightness augmentation -> helps low-light robustness
+  degrees: 5
+  mosaic: 1.0
+
+evaluate:
+  min_map50: 0.50         # quality gate; tune to your dataset
+  max_drop_vs_baseline: 0.02

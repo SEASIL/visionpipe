@@ -1,0 +1,36 @@
+# Reproducible pipeline:  dvc repro
+# Data & models are versioned by DVC (dvc add data/dataset; dvc remote add ...), code by git.
+stages:
+  qc:
+    cmd: python scripts/dataset_qc.py --images data/dataset/images/train --labels data/dataset/labels/train --num-classes ${data.num_classes} --out metrics/qc_train.json
+    deps:
+      - data/dataset
+      - scripts/dataset_qc.py
+      - src/visionpipe/datatools.py
+    metrics:
+      - metrics/qc_train.json:
+          cache: false
+  train:
+    cmd: python scripts/train.py --params params.yaml
+    deps:
+      - data/dataset
+      - scripts/train.py
+      - metrics/qc_train.json
+    params:
+      - train
+      - data
+    outs:
+      - models/best.pt
+    metrics:
+      - metrics/train_metrics.json:
+          cache: false
+  evaluate:
+    cmd: python scripts/evaluate.py --weights models/best.pt --data ${data.yaml} --min-map50 ${evaluate.min_map50} --out metrics/eval.json
+    deps:
+      - models/best.pt
+      - scripts/evaluate.py
+    params:
+      - evaluate
+    metrics:
+      - metrics/eval.json:
+          cache: false

@@ -1,0 +1,31 @@
+# Two cameras processed concurrently, sharing one detector, with cross-camera global IDs.
+# For the zero-download demo both cameras play the synthetic clip (motion detector -> one detector per camera).
+# For real use: type: onnx, weights: models/best.onnx, and rtsp:// URIs.
+detector:
+  type: motion
+  min_area: 600
+  label: person
+tracker: {min_hits: 3}
+
+cameras:
+  - id: lobby
+    uri: data/synthetic.mp4
+    rules:
+      - type: line_crossing
+        name: entrance_line
+        p1: [0, 250]
+        p2: [640, 250]
+  - id: warehouse
+    uri: data/synthetic.mp4
+    rules:
+      - type: zone_intrusion
+        name: restricted_area
+        polygon: [[340, 200], [620, 200], [620, 450], [340, 450]]
+        min_frames: 5
+      - type: loitering
+        name: restricted_area
+        polygon: [[340, 200], [620, 200], [620, 450], [340, 450]]
+        dwell_seconds: 6
+
+output:
+  events_jsonl: outputs/{camera_id}/events.jsonl

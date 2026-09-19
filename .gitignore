@@ -1,0 +1,17 @@
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+outputs/
+runs/
+mlruns/
+*.pt
+*.onnx
+*.engine
+data/*.mp4
+data/*.gt.*
+data/dataset/*
+!data/dataset/data.yaml.example
+metrics/*.json
+!metrics/.gitkeep
