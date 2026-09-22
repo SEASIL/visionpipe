@@ -1,9 +1,10 @@
 # Zero-download demo: background-subtraction detector on the synthetic clip.
 # Run:  python scripts/make_synthetic_video.py && python -m visionpipe -c configs/demo.yaml
-camera_id: cam0
-source:
-  uri: data/synthetic.mp4
-
+cameras:
+  - id: cam0
+    uri: data/synthetic.mp4
+  - id: cam1
+    uri: data/synthetic.mp4
 detector:
   type: motion
   min_area: 600

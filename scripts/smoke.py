@@ -30,10 +30,11 @@ def main():
 
     # 4. Check events
     run_cmd([sys.executable, "scripts/check_events.py", "outputs/cam0/events.jsonl", "--expect", "loitering=1", "zone_intrusion=2", "line_crossing=1"])
+    run_cmd([sys.executable, "scripts/check_events.py", "outputs/cam1/events.jsonl", "--expect", "loitering=1", "zone_intrusion=2", "line_crossing=1"])
 
     # 5. Evaluate tracking
     run_cmd([sys.executable, "scripts/eval_tracking.py", "--gt", "data/synthetic.gt.txt", "--pred", "outputs/cam0/tracks.txt", "--min-mota", "0.9", "--min-idf1", "0.9"])
-
+    run_cmd([sys.executable, "scripts/eval_tracking.py", "--gt", "data/synthetic.gt.txt", "--pred", "outputs/cam1/tracks.txt", "--min-mota", "0.9", "--min-idf1", "0.9"])
     print("Smoke test passed successfully!")
 
 
