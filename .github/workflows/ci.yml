@@ -35,5 +35,5 @@ jobs:
       - name: Container smoke test
         run: |
           docker run --rm visionpipe:cpu --help
-          docker run --rm -v "$PWD:/work" -w /work --entrypoint python visionpipe:cpu scripts/make_synthetic_video.py --out /work/data/synthetic_docker.mp4
-          docker run --rm -v "$PWD:/work" -w /work visionpipe:cpu --source /work/data/synthetic_docker.mp4 -c /work/configs/demo.yaml --stats-out /work/outputs/docker_stats.json
+          docker run --rm -v "$PWD:/work" -w /work --entrypoint python visionpipe:cpu scripts/make_synthetic_video.py --out /work/data/synthetic.mp4
+          docker run --rm -v "$PWD:/work" -w /work visionpipe:cpu -c /work/configs/demo.yaml --stats-out /work/outputs/docker_stats.json
