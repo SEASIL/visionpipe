@@ -15,3 +15,4 @@ data/dataset/*
 !data/dataset/data.yaml.example
 metrics/*.json
 !metrics/.gitkeep
+data/MOT17*

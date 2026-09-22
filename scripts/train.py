@@ -10,9 +10,10 @@ Usage:
 """
 import argparse
 import json
+import os
 import shutil
 from pathlib import Path
-import os
+
 os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 
 import mlflow

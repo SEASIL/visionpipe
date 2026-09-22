@@ -1,8 +1,9 @@
-import numpy as np
 import cv2
-from ultralytics import YOLO
-from visionpipe.detect.yolo import YOLODetector
+import numpy as np
+
 from visionpipe.detect.onnx_yolo import ONNXYoloDetector
+from visionpipe.detect.yolo import YOLODetector
+
 
 def main():
     img = np.zeros((480, 640, 3), dtype=np.uint8)

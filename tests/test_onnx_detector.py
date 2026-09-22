@@ -1,5 +1,8 @@
 """Verifies letterbox -> decode -> undo-letterbox -> class-aware NMS against a tiny synthetic ONNX model
 whose output is a known constant tensor (so no real weights are needed)."""
+import os
+
+import cv2
 import numpy as np
 import onnx
 import pytest
@@ -7,6 +10,7 @@ from onnx import TensorProto, helper, numpy_helper
 
 from visionpipe.detect import build_detector
 from visionpipe.detect.onnx_yolo import ONNXYoloDetector, letterbox
+from visionpipe.detect.yolo import YOLODetector
 
 
 def _make_model(path, preds: np.ndarray, names="{0: 'person', 1: 'car'}"):
@@ -77,9 +81,6 @@ def test_provider_options(model_path):
     assert "CPUExecutionProvider" in det.providers
 
 
-import os
-import cv2
-from visionpipe.detect.yolo import YOLODetector
 
 @pytest.mark.skipif(not os.path.exists("yolov8n.onnx"), reason="yolov8n.onnx not found")
 def test_real_weights_parity():

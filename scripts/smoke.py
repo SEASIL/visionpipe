@@ -23,7 +23,7 @@ def main():
     # 2. Clean outputs directory
     outputs_dir = root_dir / "outputs"
     if outputs_dir.exists():
-        shutil.rmtree(outputs_dir)
+        shutil.rmtree(outputs_dir, ignore_errors=True)
 
     # 3. Run pipeline
     run_cmd([sys.executable, "-m", "visionpipe", "-c", "configs/demo.yaml", "--stats-out", "outputs/stats.json"], hide_output=True)
