@@ -11,3 +11,5 @@
 | mAP50 yolov8n fine-tuned | 0.694 | dvc repro (yolov8n) | metrics/eval.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |
 | mAP50 yolov8s baseline | 0.949 | python scripts/evaluate.py --weights yolov8s.pt ... | metrics/eval_yolov8s_base.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |
 | mAP50 yolov8s fine-tuned | 0.947 | dvc repro (yolov8s) | metrics/eval.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| FPS yolov8n (PyTorch) | 43.6 | python scripts/benchmark.py --models yolov8n.pt yolov8n.onnx --providers CPUExecutionProvider --source data/synthetic.mp4 | docs/BENCHMARKS.md | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| FPS yolov8n (ONNX CPU) | 22.4 | python scripts/benchmark.py --models yolov8n.pt yolov8n.onnx --providers CPUExecutionProvider --source data/synthetic.mp4 | docs/BENCHMARKS.md | 2026-09-22 | NVIDIA RTX 4050 Laptop |

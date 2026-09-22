@@ -1,0 +1,28 @@
+[
+  {
+    "model": "yolov8n.pt",
+    "backend": "ultralytics",
+    "mean_ms": 22.94435050001084,
+    "p50_ms": 19.241199999669334,
+    "p95_ms": 39.724905001367,
+    "fps": 43.58371355944582,
+    "rss_mb": 1084.358656,
+    "gpu_mem_mb": 40.923648,
+    "warmup_ms": 7009.043099998962,
+    "map50": null,
+    "map50_95": null
+  },
+  {
+    "model": "yolov8n.onnx",
+    "backend": "CPUExecutionProvider",
+    "mean_ms": 44.603045499934524,
+    "p50_ms": 46.58780000045226,
+    "p95_ms": 52.46439000038663,
+    "fps": 22.41999371996847,
+    "rss_mb": 104.943616,
+    "gpu_mem_mb": null,
+    "warmup_ms": 1035.9501000002638,
+    "map50": null,
+    "map50_95": null
+  }
+]
