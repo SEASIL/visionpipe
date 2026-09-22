@@ -4,10 +4,10 @@ data:
   num_classes: 3          # keep in sync with data.yaml
 
 train:
-  model: yolov8n.pt       # start from COCO-pretrained weights, fine-tune on our data
+  model: yolov8s.pt       # start from COCO-pretrained weights, fine-tune on our data
   epochs: 100
   imgsz: 640
-  batch: 16
+  batch: 8
   workers: 2              # low value to prevent Windows hanging
   seed: 0
   patience: 15

@@ -7,3 +7,7 @@
 | IDF1 (MOT17-04-FRCNN, yolov8n.onnx detector) | 43.0% | `python scripts/eval_tracking.py --gt data/MOT17/train/MOT17-04-FRCNN/gt/gt.txt --pred outputs/cam0/tracks.txt --gt-class 1 --out metrics/tracking_eval.json` | `metrics/tracking_eval.json` | 2026-09-22 | NVIDIA RTX 4050 Laptop |
 | ID Switches (MOT17-04-FRCNN, yolov8n.onnx detector) | 28 | `python scripts/eval_tracking.py --gt data/MOT17/train/MOT17-04-FRCNN/gt/gt.txt --pred outputs/cam0/tracks.txt --gt-class 1 --out metrics/tracking_eval.json` | `metrics/tracking_eval.json` | 2026-09-22 | NVIDIA RTX 4050 Laptop |
 | Fragmentations (MOT17-04-FRCNN, yolov8n.onnx detector) | 118 | `python scripts/eval_tracking.py --gt data/MOT17/train/MOT17-04-FRCNN/gt/gt.txt --pred outputs/cam0/tracks.txt --gt-class 1 --out metrics/tracking_eval.json` | `metrics/tracking_eval.json` | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| mAP50 yolov8n baseline | 0.988 | python scripts/evaluate.py --weights yolov8n.pt ... | metrics/eval_yolov8n_base.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| mAP50 yolov8n fine-tuned | 0.694 | dvc repro (yolov8n) | metrics/eval.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| mAP50 yolov8s baseline | 0.949 | python scripts/evaluate.py --weights yolov8s.pt ... | metrics/eval_yolov8s_base.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| mAP50 yolov8s fine-tuned | 0.947 | dvc repro (yolov8s) | metrics/eval.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |

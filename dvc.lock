@@ -7,9 +7,9 @@ stages:
     deps:
     - path: data/dataset
       hash: md5
-      md5: 328acaa3e6cfb7009f537627d7f1cdf5.dir
-      size: 252
-      nfiles: 1
+      md5: ca41364f6953cea1346b2bd85d23c189.dir
+      size: 1158752
+      nfiles: 16
     - path: scripts/dataset_qc.py
       hash: md5
       md5: 451f718cbcbde99f7c44fdcaa4389364
@@ -21,34 +21,34 @@ stages:
     outs:
     - path: metrics/qc_train.json
       hash: md5
-      md5: 64780a80cfa565120c2737adce82b7cc
-      size: 135
+      md5: db47ad610bf6b33c6baa21bebccb3422
+      size: 448
   train:
     cmd: python scripts/train.py --params params.yaml
     deps:
     - path: data/dataset
       hash: md5
-      md5: 328acaa3e6cfb7009f537627d7f1cdf5.dir
-      size: 252
-      nfiles: 1
+      md5: ca41364f6953cea1346b2bd85d23c189.dir
+      size: 1158752
+      nfiles: 16
     - path: metrics/qc_train.json
       hash: md5
-      md5: 64780a80cfa565120c2737adce82b7cc
-      size: 135
+      md5: db47ad610bf6b33c6baa21bebccb3422
+      size: 448
     - path: scripts/train.py
       hash: md5
-      md5: dc33832f3f51c544005a45834c49dd20
-      size: 2325
+      md5: 253541bdd0c3e377ef63cf8fd176d24b
+      size: 2326
     params:
       params.yaml:
         data:
-          yaml: data/tiny_dataset/data.yaml
+          yaml: data/dataset/data.yaml
           num_classes: 3
         train:
-          model: yolov8n.pt
-          epochs: 1
+          model: yolov8s.pt
+          epochs: 100
           imgsz: 640
-          batch: 16
+          batch: 8
           workers: 2
           seed: 0
           patience: 15
@@ -59,20 +59,20 @@ stages:
     outs:
     - path: metrics/train_metrics.json
       hash: md5
-      md5: 56e3df1415afed12816df1e773734ed7
-      size: 194
+      md5: 04b6161342b7c927f635247002ed5986
+      size: 268
     - path: models/best.pt
       hash: md5
-      md5: b3c1e6b0ff32d9bcf4050fc25564fc6c
-      size: 6243555
+      md5: d7204d5f1e2cef9ea77b37d6ac48abd0
+      size: 22492195
   evaluate:
     cmd: python scripts/evaluate.py --weights models/best.pt --data 
-      data/tiny_dataset/data.yaml --min-map50 0.0 --out metrics/eval.json
+      data/dataset/data.yaml --min-map50 0.5 --out metrics/eval.json
     deps:
     - path: models/best.pt
       hash: md5
-      md5: b3c1e6b0ff32d9bcf4050fc25564fc6c
-      size: 6243555
+      md5: d7204d5f1e2cef9ea77b37d6ac48abd0
+      size: 22492195
     - path: scripts/evaluate.py
       hash: md5
       md5: c828a2deaf6c3cc411b1c23b0c197d1f
@@ -80,10 +80,10 @@ stages:
     params:
       params.yaml:
         evaluate:
-          min_map50: 0.0
+          min_map50: 0.5
           max_drop_vs_baseline: 0.02
     outs:
     - path: metrics/eval.json
       hash: md5
-      md5: f3b86b4b085062348f1dbcb3566c0f93
-      size: 127
+      md5: 9e4ea0012105e02432110ae644d71701
+      size: 202
