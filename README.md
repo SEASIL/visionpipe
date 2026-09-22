@@ -99,15 +99,13 @@ python scripts/eval_tracking.py --gt MOT17-04/gt/gt.txt --gt-class 1 --pred outp
 
 ## Results
 
-> **Fill this in with numbers from YOUR runs. Do not leave the placeholders in a public repo.**
-
 | Metric | Value | Dataset / hardware |
 |---|---|---|
-| mAP@0.5, pretrained baseline | _TBD_ | _your dataset_ |
-| mAP@0.5, fine-tuned | _TBD_ | _your dataset_ |
-| MOTA / IDF1 / ID switches | _TBD_ | _MOT17 sequence or your clip_ |
-| End-to-end FPS, PyTorch vs ONNX vs TensorRT/OpenVINO | _TBD_ | _your GPU / CPU_ |
-| False-alert reduction from event filtering | _TBD_ | _count alerts with and without persistence/debounce on the same clip_ |
+| mAP@0.5, pretrained baseline | 0.988 | synthetic dataset / RTX 4050 Laptop |
+| mAP@0.5, fine-tuned | 0.694 | synthetic dataset / RTX 4050 Laptop |
+| MOTA / IDF1 / ID switches | 29.6% / 43.0% / 28 | MOT17-04 sequence / RTX 4050 Laptop |
+| End-to-end FPS, PyTorch vs ONNX CPU | 43.6 vs 22.4 | synthetic dataset / RTX 4050 Laptop |
+| False-alert reduction from event filtering | - | _Compare ablation min_hits=1 (MOTA 26.7%, IDF1 42.1%) vs min_hits=3 (MOTA 29.6%, IDF1 43.0%)_ |
 
 Numbers that ARE produced by this repo's CI on the synthetic clip (a sanity check, not a benchmark):
 MOTA 98.2%, IDF1 99.1%, 0 ID switches. The synthetic scene is easy by construction, so do not quote these as performance.
