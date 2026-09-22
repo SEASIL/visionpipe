@@ -12,6 +12,7 @@ import cv2
 
 from .detect.base import Detector
 from .events.engine import EventEngine
+from .events.sinks import EventSink
 from .io.source import VideoSource
 from .timing import StageTimer
 from .track.bytetrack import ByteTracker
@@ -26,6 +27,7 @@ class RunStats:
     camera_id: str
     frames: int = 0
     wall_seconds: float = 0.0
+    dropped_frames: int = 0
     events: int = 0
     events_by_type: Dict[str, int] = field(default_factory=dict)
     stages: Dict[str, Dict[str, float]] = field(default_factory=dict)
@@ -40,6 +42,7 @@ class RunStats:
             "frames": self.frames,
             "wall_seconds": round(self.wall_seconds, 3),
             "fps": round(self.fps, 2),
+            "dropped_frames": self.dropped_frames,
             "events": self.events,
             "events_by_type": self.events_by_type,
             "stage_latency": self.stages,
@@ -113,12 +116,14 @@ class Pipeline:
         engine: EventEngine,
         outputs: Optional[Outputs] = None,
         on_event: Optional[Callable[[Event], None]] = None,
+        sinks: Optional[List[EventSink]] = None,
         reid=None,
         show: bool = False,
     ):
         self.source, self.detector, self.tracker, self.engine = source, detector, tracker, engine
         self.outputs = outputs or Outputs()
         self.on_event = on_event
+        self.sinks = sinks or []
         self.reid = reid
         self.show = show
         self.timer = StageTimer()
@@ -158,6 +163,8 @@ class Pipeline:
                     log.info("EVENT %s", json.dumps(e.to_dict()))
                     if self.on_event:
                         self.on_event(e)
+                    for sink in self.sinks:
+                        sink.send(e)
                 recent = [e for e in recent if frame.index - e.frame_index < 40]  # banner lifetime (frames)
 
                 if self.outputs.video_path or self.show:
@@ -178,8 +185,11 @@ class Pipeline:
         finally:
             self.source.close()
             self.outputs.close()
+            for sink in self.sinks:
+                sink.close()
             if self.show:
                 cv2.destroyAllWindows()
+        stats.dropped_frames = self.source.dropped_frames
         stats.wall_seconds = time.perf_counter() - t_start
         stats.stages = self.timer.summary()
         return stats

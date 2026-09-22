@@ -50,6 +50,7 @@ class VideoSource:
         self.max_backoff_s = max_backoff_s
         self.fps: float = 25.0
         self.size: Optional[tuple] = None  # (w, h) once known
+        self.dropped_frames = 0
         self._stop = threading.Event()
 
     # ---------------------------------------------------------------- public
@@ -99,6 +100,7 @@ class VideoSource:
                 except queue.Full:
                     try:
                         q.get_nowait()
+                        self.dropped_frames += 1
                     except queue.Empty:
                         pass
 

@@ -1,0 +1,10 @@
+camera_id: cam0
+source:
+  uri: data/MOT17/train/MOT17-04-FRCNN/img1/%06d.jpg
+detector:
+  type: onnx
+  weights: yolov8n.onnx
+tracker:
+  min_hits: 1
+output:
+  mot_txt: outputs/cam0/tracks_min_hits_1.txt

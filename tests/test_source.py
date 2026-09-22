@@ -64,6 +64,7 @@ def test_live_drops_old_frames_when_consumer_is_slow(video):
         time.sleep(0.02)
     assert 1 <= len(stamps) < 280  # far fewer than the 560 frames produced
     assert stamps == sorted(stamps)  # order preserved
+    assert src.dropped_frames > 0
 
 
 def test_live_unreachable_without_reconnect_ends_cleanly():

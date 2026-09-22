@@ -34,6 +34,12 @@ def side_of_line(pt: Point, a: Point, b: Point) -> int:
     return 1 if c > 0 else (-1 if c < 0 else 0)
 
 
+def point_line_distance(pt: Point, a: Point, b: Point) -> float:
+    """Perpendicular distance from pt to the infinite line passing through a and b."""
+    d = distance(a, b)
+    return abs(cross(a, b, pt)) / d if d > 0 else distance(pt, a)
+
+
 def segments_properly_intersect(p1: Point, p2: Point, q1: Point, q2: Point) -> bool:
     """True if segment p1-p2 crosses segment q1-q2 (touching endpoints does not count)."""
     d1 = cross(q1, q2, p1)

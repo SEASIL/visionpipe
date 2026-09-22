@@ -8,6 +8,7 @@ from .rules import (
     ZoneIntrusion,
     build_rules,
 )
+from .sinks import EventSink, MQTTSink, WebhookSink
 
 __all__ = [
     "EventEngine",
@@ -18,4 +19,7 @@ __all__ = [
     "CrowdDetection",
     "AbandonedObject",
     "build_rules",
+    "EventSink",
+    "WebhookSink",
+    "MQTTSink",
 ]

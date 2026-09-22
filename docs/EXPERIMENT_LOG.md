@@ -13,3 +13,5 @@
 | mAP50 yolov8s fine-tuned | 0.947 | dvc repro (yolov8s) | metrics/eval.json | 2026-09-22 | NVIDIA RTX 4050 Laptop |
 | FPS yolov8n (PyTorch) | 43.6 | python scripts/benchmark.py --models yolov8n.pt yolov8n.onnx --providers CPUExecutionProvider --source data/synthetic.mp4 | docs/BENCHMARKS.md | 2026-09-22 | NVIDIA RTX 4050 Laptop |
 | FPS yolov8n (ONNX CPU) | 22.4 | python scripts/benchmark.py --models yolov8n.pt yolov8n.onnx --providers CPUExecutionProvider --source data/synthetic.mp4 | docs/BENCHMARKS.md | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| MOTA (MOT17-04, ablation min_hits=1) | 26.7% | python scripts/eval_tracking.py --gt data/MOT17/train/MOT17-04-FRCNN/gt/gt.txt --pred outputs/cam0/tracks_min_hits_1.txt --gt-class 1 | stdout | 2026-09-22 | NVIDIA RTX 4050 Laptop |
+| IDF1 (MOT17-04, ablation min_hits=1) | 42.1% | python scripts/eval_tracking.py --gt data/MOT17/train/MOT17-04-FRCNN/gt/gt.txt --pred outputs/cam0/tracks_min_hits_1.txt --gt-class 1 | stdout | 2026-09-22 | NVIDIA RTX 4050 Laptop |

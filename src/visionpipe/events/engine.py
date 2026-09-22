@@ -13,7 +13,8 @@ class EventEngine:
         self.rules = list(rules)
 
     def update(self, frame: Frame, tracks: List[Track]) -> List[Event]:
-        ctx = Context(frame.camera_id, frame.index, frame.timestamp, tracks)
+        h, w = frame.image.shape[:2]
+        ctx = Context(frame.camera_id, frame.index, frame.timestamp, tracks, frame_width=w, frame_height=h)
         events: List[Event] = []
         for rule in self.rules:
             events.extend(rule.update(ctx))

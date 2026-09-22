@@ -20,6 +20,7 @@ from ..geometry import (
     Point,
     distance,
     point_in_polygon,
+    point_line_distance,
     segments_properly_intersect,
     side_of_line,
 )
@@ -34,6 +35,8 @@ class Context:
     frame_index: int
     timestamp: float
     tracks: List[Track]
+    frame_width: int
+    frame_height: int
 
 
 def _prune(states: Dict[int, object], frame_index: int, stale: int = STALE_FRAMES) -> None:
@@ -44,6 +47,20 @@ def _prune(states: Dict[int, object], frame_index: int, stale: int = STALE_FRAME
 
 def _class_ok(track: Track, classes: Optional[Sequence[str]]) -> bool:
     return classes is None or track.cls_name in classes
+
+
+def _scale_polygon(polygon: Sequence[Point], w: int, h: int) -> List[Point]:
+    if not polygon:
+        return list(polygon)
+    if max(p[0] for p in polygon) <= 1.0 and max(p[1] for p in polygon) <= 1.0:
+        return [(p[0] * w, p[1] * h) for p in polygon]
+    return list(polygon)
+
+
+def _scale_point(p: Point, w: int, h: int) -> Point:
+    if p[0] <= 1.0 and p[1] <= 1.0:
+        return (p[0] * w, p[1] * h)
+    return p
 
 
 class Rule(ABC):
@@ -95,9 +112,13 @@ class _ZoneRule(Rule):
         self.anchor = anchor
         self.exit_frames = exit_frames
         self._state: Dict[int, _Presence] = {}
+        self._scaled = False
 
     def _observe(self, ctx: Context) -> List[Tuple[Track, _Presence]]:
         """Update presence state; return (track, state) for tracks currently inside."""
+        if not self._scaled:
+            self.polygon = _scale_polygon(self.polygon, ctx.frame_width, ctx.frame_height)
+            self._scaled = True
         inside_now: List[Tuple[Track, _Presence]] = []
         for tr in ctx.tracks:
             if not _class_ok(tr, self.classes):
@@ -180,16 +201,25 @@ class LineCrossing(Rule):
         anchor: str = "center",
         direction: str = "any",
         min_gap_frames: int = 15,
+        hysteresis_px: float = 0.0,
     ):
         super().__init__(name, classes)
         self.p1, self.p2 = tuple(map(float, p1)), tuple(map(float, p2))
         self.anchor = anchor
         self.direction = direction
         self.min_gap_frames = min_gap_frames
+        self.hysteresis_px = hysteresis_px
         self.counts = {"forward": 0, "backward": 0}
         self._state: Dict[int, _LineState] = {}
+        self._scaled = False
 
     def update(self, ctx: Context) -> List[Event]:
+        if not self._scaled:
+            self.p1 = _scale_point(self.p1, ctx.frame_width, ctx.frame_height)
+            self.p2 = _scale_point(self.p2, ctx.frame_width, ctx.frame_height)
+            self.hysteresis_px = self.hysteresis_px  # Not scaled, assuming absolute pixels
+            self._scaled = True
+
         events = []
         for tr in ctx.tracks:
             if not _class_ok(tr, self.classes):
@@ -200,6 +230,9 @@ class LineCrossing(Rule):
             side = side_of_line(pt, self.p1, self.p2)
             if side == 0:  # exactly on the line: wait for the next frame
                 continue
+            if self.hysteresis_px > 0 and point_line_distance(pt, self.p1, self.p2) <= self.hysteresis_px:
+                continue
+
             if (
                 st.last_point is not None
                 and st.last_side != 0
@@ -212,6 +245,7 @@ class LineCrossing(Rule):
                     self.counts[direction] += 1
                     st.last_cross_frame = ctx.frame_index
                     events.append(self._event(ctx, tr, direction=direction, counts=dict(self.counts)))
+            
             st.last_point, st.last_side = pt, side
         _prune(self._state, ctx.frame_index)
         return events
@@ -240,8 +274,13 @@ class CrowdDetection(Rule):
         self._high = 0
         self._low = 0
         self._active = False
+        self._scaled = False
 
     def update(self, ctx: Context) -> List[Event]:
+        if not self._scaled:
+            self.polygon = _scale_polygon(self.polygon, ctx.frame_width, ctx.frame_height)
+            self._scaled = True
+
         count = sum(
             1
             for t in ctx.tracks

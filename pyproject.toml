@@ -20,6 +20,7 @@ cpu = ["onnxruntime>=1.16"]
 gpu = ["onnxruntime-gpu>=1.16"]
 train = ["ultralytics>=8.3", "mlflow>=2.10", "dvc>=3.40", "motmetrics>=1.4", "psutil"]
 dev = ["pytest>=7.4", "pytest-cov", "ruff", "onnx", "motmetrics>=1.4"]
+sinks = ["requests", "paho-mqtt"]
 
 [project.scripts]
 visionpipe = "visionpipe.cli:main"

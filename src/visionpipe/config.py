@@ -7,6 +7,7 @@ import yaml
 
 from .detect import build_detector
 from .events import EventEngine, build_rules
+from .events.sinks import MQTTSink, WebhookSink
 from .io import VideoSource
 from .pipeline import Outputs, Pipeline
 from .track import ByteTracker
@@ -48,5 +49,16 @@ def build_pipeline(cfg: Dict[str, Any], detector=None, reid=None, show: bool = F
     detector = detector or build_detector(cfg["detector"])
     tracker = ByteTracker(**cfg.get("tracker", {}))
     engine = EventEngine(build_rules(cfg.get("rules", [])))
+    
+    sinks_cfg = cfg.get("sinks", [])
+    sinks = []
+    for sc in sinks_cfg:
+        sc = sc.copy()
+        t = sc.pop("type", None)
+        if t == "webhook":
+            sinks.append(WebhookSink(**sc))
+        elif t == "mqtt":
+            sinks.append(MQTTSink(**sc))
+            
     outputs = Outputs(**{k: v.format(camera_id=cam) for k, v in cfg.get("output", {}).items() if v})
-    return Pipeline(source, detector, tracker, engine, outputs, reid=reid, show=show)
+    return Pipeline(source, detector, tracker, engine, outputs, sinks=sinks, reid=reid, show=show)

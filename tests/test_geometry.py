@@ -3,6 +3,7 @@ import numpy as np
 from visionpipe.geometry import (
     iou_matrix,
     point_in_polygon,
+    point_line_distance,
     segments_properly_intersect,
     side_of_line,
 )
@@ -30,6 +31,14 @@ def test_side_of_line_and_intersection():
     assert side_of_line((5, 5), a, b) == 0
     assert segments_properly_intersect((5, 0), (5, 9), a, b)
     assert not segments_properly_intersect((15, 0), (15, 9), a, b)  # crosses the infinite line only
+
+
+def test_point_line_distance():
+    a, b = (0, 0), (10, 0)
+    assert point_line_distance((5, 5), a, b) == 5.0
+    assert point_line_distance((-10, -3), a, b) == 3.0
+    assert point_line_distance((5, 0), a, b) == 0.0
+    assert point_line_distance((20, 0), a, b) == 0.0
 
 
 def test_iou_matrix():

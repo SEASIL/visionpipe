@@ -13,8 +13,8 @@ from visionpipe.events.rules import Context
 ZONE = [(100, 100), (300, 100), (300, 300), (100, 300)]
 
 
-def ctx(i, tracks, fps=25.0):
-    return Context("cam0", i, i / fps, tracks)
+def ctx(i, tracks, fps=25.0, w=1920, h=1080):
+    return Context("cam0", i, i / fps, tracks, frame_width=w, frame_height=h)
 
 
 # ------------------------------------------------------------------ intrusion
@@ -113,6 +113,39 @@ def test_line_direction_filter():
     for i in range(20, 40):
         events += rule.update(ctx(i, [make_track(1, 200, 100 + 10 * (39 - i))]))
     assert len(events) <= 1
+
+
+def test_line_crossing_hysteresis_debounces_small_jitters():
+    rule = LineCrossing("door", (0, 200), (400, 200), min_gap_frames=1, hysteresis_px=10.0)
+    events = []
+    # Cross down properly
+    events += rule.update(ctx(0, [make_track(1, 200, 180)]))
+    events += rule.update(ctx(1, [make_track(1, 200, 215)]))  # 15px > 10px hysteresis, crosses
+    assert len(events) == 1
+    
+    # Jitter slightly across the line without exiting the hysteresis band
+    events += rule.update(ctx(2, [make_track(1, 200, 195)]))  # crossed back, but distance 5px <= 10px
+    events += rule.update(ctx(3, [make_track(1, 200, 205)]))  # crossed again, but side shouldn't have flipped back
+    assert len(events) == 1  # No new event
+    
+    # Cross back completely
+    events += rule.update(ctx(4, [make_track(1, 200, 180)]))
+    events += rule.update(ctx(5, [make_track(1, 200, 215)]))
+    assert len(events) == 3
+
+
+def test_normalized_coordinates_scaling():
+    # 0.5 * 1000 = 500, 0.5 * 1000 = 500
+    rule = ZoneIntrusion("restricted", [(0.1, 0.1), (0.9, 0.1), (0.9, 0.9), (0.1, 0.9)], min_frames=2)
+    # Track inside the scaled zone (100,100) to (900,900)
+    events = rule.update(ctx(0, [make_track(1, 500, 500)], w=1000, h=1000))
+    events += rule.update(ctx(1, [make_track(1, 500, 500)], w=1000, h=1000))
+    assert len(events) == 1
+    
+    rule_line = LineCrossing("line", (0.0, 0.5), (1.0, 0.5), min_gap_frames=1)
+    events = rule_line.update(ctx(0, [make_track(1, 500, 400)], w=1000, h=1000))
+    events += rule_line.update(ctx(1, [make_track(1, 500, 600)], w=1000, h=1000))
+    assert len(events) == 1
 
 
 # ------------------------------------------------------------------ crowd

@@ -1,5 +1,14 @@
 # VisionPipe: real-time multi-camera video analytics
 
+![Python](https://img.shields.io/badge/python-3.10+-blue.svg?style=flat&logo=python&logoColor=white)
+![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=flat&logo=opencv&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=flat&logo=PyTorch&logoColor=white)
+![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-blue.svg?style=flat&logo=onnx&logoColor=white)
+![MLflow](https://img.shields.io/badge/MLflow-0194E2.svg?style=flat&logo=MLflow&logoColor=white)
+![DVC](https://img.shields.io/badge/DVC-945DD6.svg?style=flat&logo=dvc&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=flat&logo=githubactions&logoColor=white)
+
 Turns raw video streams into **reliable, structured business events**: zone intrusion, loitering,
 line-crossing counts, crowd detection and abandoned objects. Pipeline: RTSP/file ingestion → detection →
 multi-object tracking → rule-based event engine → JSON/annotated video output.
@@ -12,6 +21,7 @@ flowchart LR
     D --> E[(events.jsonl<br/>metadata.jsonl<br/>MOT tracks.txt<br/>annotated.mp4)]
     C -.-> F[Cross-camera re-ID<br/>global IDs]
     F -.-> D
+    D -.-> G[Event Sinks<br/>Webhook, MQTT]
 ```
 
 **What is in the box**
@@ -52,7 +62,9 @@ python -m visionpipe -c configs/multicam.yaml   # several cameras at once
 ```
 
 Use `detector: {type: yolo, weights: yolov8n.pt}` or, for the lightweight runtime, `{type: onnx, weights: models/best.onnx}`.
-Rules are declared in YAML (see `configs/demo.yaml`). Draw zone polygons in pixel coordinates of the stream.
+Rules are declared in YAML (see `configs/demo.yaml`). Draw zone polygons in pixel coordinates of the stream, or use `python scripts/pick_zone.py --norm video.mp4` to interactively click and generate coordinates.
+
+You can also send events via HTTP POST or MQTT by adding `sinks` to your config.
 
 Example event:
 
@@ -113,7 +125,7 @@ See `docs/FAILURE_ANALYSIS.md` (fill in per condition), `docs/ARCHITECTURE.md` a
 
 ```
 src/visionpipe/   io/ detect/ track/ events/ pipeline.py multicam.py reid.py datatools.py config.py cli.py
-scripts/          make_synthetic_video, train, evaluate, export_model, benchmark, eval_tracking, dataset_qc, auto_label, check_events
+scripts/          make_synthetic_video, train, evaluate, export_model, benchmark, eval_tracking, dataset_qc, auto_label, check_events, pick_zone
 configs/          demo.yaml  multicam.yaml
 tests/            geometry, tracker, rules, ONNX detector, e2e pipeline, source, re-ID, datatools, multi-camera
 dvc.yaml params.yaml Dockerfile docker/Dockerfile.gpu Makefile .github/workflows/ci.yml

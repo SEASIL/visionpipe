@@ -16,3 +16,12 @@ data/dataset/*
 metrics/*.json
 !metrics/.gitkeep
 data/MOT17*
+
+# Python & OS
+*.pyc
+.venv/
+venv/
+env/
+.DS_Store
+.vscode/
+.idea/
