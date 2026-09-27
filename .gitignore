@@ -19,9 +19,17 @@ data/MOT17*
 
 # Python & OS
 *.pyc
+*.pyo
+*.pyd
 .venv/
 venv/
 env/
+.env
+*.log
+dist/
+build/
+htmlcov/
+.mypy_cache/
 .DS_Store
 .vscode/
 .idea/

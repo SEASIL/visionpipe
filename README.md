@@ -1,6 +1,7 @@
 # VisionPipe: real-time multi-camera video analytics
 
-![Python](https://img.shields.io/badge/python-3.10+-blue.svg?style=flat&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/python-3.11-blue.svg?style=flat&logo=python&logoColor=white)
+![Windows 11](https://img.shields.io/badge/Windows%2011-%230079d5.svg?style=flat&logo=Windows%2011&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=flat&logo=opencv&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=flat&logo=PyTorch&logoColor=white)
 ![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-blue.svg?style=flat&logo=onnx&logoColor=white)
@@ -8,6 +9,7 @@
 ![DVC](https://img.shields.io/badge/DVC-945DD6.svg?style=flat&logo=dvc&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=flat&logo=githubactions&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-660066.svg?style=flat&logo=mqtt&logoColor=white)
 
 Turns raw video streams into **reliable, structured business events**: zone intrusion, loitering,
 line-crossing counts, crowd detection and abandoned objects. Pipeline: RTSP/file ingestion → detection →
@@ -31,7 +33,9 @@ flowchart LR
 | Ingestion | `io/source.py`: file + live streams, bounded queue that drops stale frames, exponential-backoff reconnect |
 | Detection | `detect/`: Ultralytics YOLO wrapper, **hand-written ONNX Runtime YOLO detector** (letterbox, decode, class-aware NMS, provider auto-selection), background-subtraction baseline |
 | Tracking | `track/`: own ByteTrack-style tracker (constant-velocity Kalman filter, Hungarian matching, low-confidence rescue stage, no cross-class matches) |
-| Event engine | `events/rules.py`: persistence, debouncing, fire-once, hysteresis, min-gap and stale-state GC to keep false positives down |
+| Event engine | `events/rules.py`: persistence, debouncing, fire-once, hysteresis, min-gap and stale-state GC to keep false positives down. Normalised coordinate scaling logic across rules. |
+| Event sinks | `events/sinks.py`: Webhook & MQTT operating reliably on a background queue. |
+| Telemetry | Metrics for tracking dropped frames during ingestion. |
 | Multi-camera | `multicam.py` (thread per camera, shared detector) and `reid.py` (baseline colour-histogram global IDs) |
 | Dataset tooling | `datatools.py`: label QC, auto-labelling (pseudo-labels for CVAT), uncertainty-based active-learning review queue |
 | MLOps | DVC pipeline (`dvc.yaml`), MLflow logging (`scripts/train.py`), mAP regression gate (`scripts/evaluate.py`), GitHub Actions CI, Docker (CPU + GPU) |
@@ -43,7 +47,7 @@ flowchart LR
 ```bash
 pip install -e ".[cpu,dev]"
 make demo          # generates a synthetic clip, runs the pipeline, writes outputs/cam0/*
-make test          # 49 unit + end-to-end tests
+make test          # 56 unit + end-to-end tests
 make smoke         # CI gate: expected events + MOTA/IDF1 thresholds
 ```
 
